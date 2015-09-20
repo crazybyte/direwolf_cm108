@@ -195,7 +195,7 @@ endif
 # ALSA (for Linux), comment out (or remove) the two lines below.
 
 CFLAGS += -DUSE_ALSA
-LDLIBS += -lasound
+LDLIBS += -lasound -ludev
 
 
 # Uncomment following lines to enable GPS interface & tracker function.
@@ -217,7 +217,7 @@ direwolf : direwolf.o config.o recv.o demod.o dsp.o demod_afsk.o demod_9600.o hd
 		fcs_calc.o ax25_pad.o \
 		decode_aprs.o symbols.o server.o kiss.o kissnet.o kiss_frame.o hdlc_send.o fcs_calc.o \
 		gen_tone.o audio.o digipeater.o pfilter.o dedupe.o tq.o xmit.o \
-		ptt.o beacon.o dwgps.o encode_aprs.o latlong.o encode_aprs.o latlong.o textcolor.o \
+		ptt.o cm108.o beacon.o dwgps.o encode_aprs.o latlong.o encode_aprs.o latlong.o textcolor.o \
 		dtmf.o aprs_tt.o tt_user.o tt_text.o igate.o nmea.o log.o telemetry.o dtime_now.o \
 		geotranz.a
 	$(CC) $(CFLAGS) -o $@ $^ -lpthread -lrt $(LDLIBS) -lm

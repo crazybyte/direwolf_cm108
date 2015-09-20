@@ -1367,6 +1367,18 @@ void config_init (char *fname, struct audio_s *p_audio_config,
 	      dw_printf ("Config file line %d: %s with LPT is only available on x86 Linux.\n", line, otname);
 #endif		
 	    }
+        else if (strcasecmp(t, "CM108") == 0) {
+
+/* CM108 case, Linux only. */
+
+#if ( defined(__linux__) || defined(__unix__) )
+
+	      p_audio_config->achan[channel].octrl[ot].ptt_method = PTT_METHOD_CM108;
+#else
+	      text_color_set(DW_COLOR_ERROR);
+	      dw_printf ("Config file line %d: %s with CM108 is only available on Linux.\n", line, otname);
+#endif		
+	    }
 	    else  {
 
 /* serial port case. */

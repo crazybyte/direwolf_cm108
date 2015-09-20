@@ -72,6 +72,7 @@ typedef int HANDLE;
 #include "textcolor.h"
 #include "audio.h"
 #include "ptt.h"
+#include "cm108.h"
 
 
 #if __WIN32__
@@ -561,6 +562,83 @@ void ptt_init (struct audio_s *audio_config_p)
 
 #endif /* x86 Linux */
 
+/*
+ * Set up cm108 soundcard.
+ * 
+ * Restrictions:
+ * 	Only the first found card.
+ * 	For Linux only.
+ */
+
+#if  ( defined(__linux__) || defined(__unix__) )
+
+	for (ch = 0; ch < MAX_CHANS; ch++) {
+	  if (save_audio_config_p->achan[ch].valid) {
+	    int ot;
+	    for (ot = 0; ot < NUM_OCTYPES; ot++) {
+	      if (audio_config_p->achan[ch].octrl[ot].ptt_method == PTT_METHOD_CM108) {
+
+	        /* Can't open the same device more than once. */
+	        /* Did some earlier channel use the same ptt device name? */
+
+	        int same_device_used = 0;
+	        int j, k;
+	
+	        for (j = ch; j >= 0; j--) {
+	          if (audio_config_p->achan[j].valid) {
+		    for (k = ((j==ch) ? (ot - 1) : (NUM_OCTYPES-1)); k >= 0; k--) {
+	              if (strcmp(audio_config_p->achan[ch].octrl[ot].ptt_device,audio_config_p->achan[j].octrl[k].ptt_device) == 0) {
+	                fd = ptt_fd[j][k];
+	                same_device_used = 1;
+	              }
+	            }
+	          }
+	        }
+
+            const char *cm108_path;
+
+	        if ( ! same_device_used) {
+              cm108_path = cm108_find_device();
+
+              if(!cm108_path) {
+                  dw_printf("No cm108 device found.\n");
+                  fd = INVALID_HANDLE_VALUE;
+              } else {
+	              fd = cm108_open(cm108_path);
+              }
+	        }
+
+	        if (fd != INVALID_HANDLE_VALUE) {
+	          ptt_fd[ch][ot] = fd;
+	        }
+	        else {
+	          text_color_set(DW_COLOR_ERROR);
+	          dw_printf ("ERROR - Can't open %s for CM108 PTT control.\n", cm108_path);
+	          dw_printf ("You probably don't have adequate permissions to access I/O ports.\n");
+	          dw_printf ("Either run direwolf as root or change these permissions:\n");
+	          dw_printf ("  sudo chmod go+rw %s\n", cm108_path);
+
+	          /* Don't try using it later if device open failed. */
+
+	          audio_config_p->achan[ch].octrl[ot].ptt_method = PTT_METHOD_NONE;
+	        }
+	    
+
+/*
+ * Set initial state off.
+ * ptt_set will invert output signal if appropriate.
+ */	  
+	        ptt_set (ot, ch, 0);
+
+	      }       /* if parallel printer port method. */
+	    }       /* for each output type */
+	  }       /* if valid channel. */
+	}	/* For each channel. */
+
+
+
+#endif /* x86 Linux */
+
 
 /* Why doesn't it transmit?  Probably forgot to specify PTT option. */
 
@@ -757,6 +835,20 @@ void ptt_set (int ot, int chan, int ptt_signal)
 	}
 
 #endif /* x86 Linux */
+
+/*
+ * Using cm108 over usb?
+ */
+
+#if  ( defined(__linux__) || defined(__unix__) )
+
+    if (save_audio_config_p->achan[chan].octrl[ot].ptt_method == PTT_METHOD_CM108 &&
+        ptt_fd[chan][ot] != INVALID_HANDLE_VALUE) {
+
+      cm108_ptt_set(ptt_fd[chan][ot], ptt);
+    }
+
+#endif /* Linux */
 
 
 } /* end ptt_set */
