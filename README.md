@@ -1,5 +1,5 @@
 
-# Dire Wolf #
+# Dire Wolf - Patched version with CM108 PTT support #
 
 ### Decoded Information from Radio Emissions for Windows Or Linux Fans ###
 
@@ -68,7 +68,7 @@ For more details see the **User Guide** in the [doc directory](https://github.co
 ### Linux - Using git clone ###
 
 	cd ~
-	git clone https://www.github.com/wb2osz/direwolf
+	git clone https://github.com/donothingloop/direwolf_cm108
 	cd direwolf
 	git checkout 1.2
 	make
