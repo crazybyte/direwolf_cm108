@@ -1,6 +1,8 @@
 
 # Dire Wolf - Patched version with CM108 PTT support #
 
+for the original version please see [https://github.com/wb2osz/direwolf]
+
 ### Decoded Information from Radio Emissions for Windows Or Linux Fans ###
 
 In the early days of Amateur Packet Radio, it was necessary to use a “Terminal Node Controller” (TNC) with specialized hardware.  Those days are gone.  You can now get better results at lower cost by connecting your radio to the “soundcard” interface of a computer and using software to decode the signals.
